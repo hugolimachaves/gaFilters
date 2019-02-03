@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import random
 
-
 '''
 **********************************************************************************************
 **********************************************************************************************
@@ -18,7 +17,6 @@ import random
 **********************************************************************************************
 **********************************************************************************************
 '''
-
 
 # Variaveis obtidas atraves do arquivo parameter.json
 #--------------------------------------------------------------------
@@ -36,14 +34,12 @@ Y =3
 DIM = 10
 SIZE_FILTER = 41
 
-
 def getPathPickle(tipo):
 	if tipo == 'gt':
 		caminhoPickle = PATH_GT_ESPACIAL
 	if tipo == 'siam':
 		caminhoPickle = PATH_SIAMESE_ESPACIAL
 	return caminhoPickle
-
 
 def getSignal(tipo, video):
 	
@@ -66,18 +62,10 @@ def getSignal(tipo, video):
 			acc[:,:] = result[:,X,Y,:,0] + acc[:,:]
 	return acc
 
-fullSignal = getSignal(TIPO,VIDEO)
 
-
-global sinal
-sinal = np.ravel(fullSignal[:,DIM])
-sinal_master = np.array(sinal)
 
 
 filtro = np.zeros(SIZE_FILTER)/SIZE_FILTER
-
-corr = signal.correlate(sinal, filtro, mode='valid')
-
 
 def calcularFFT(sign, escala = 'dB'):
 	gamma =  abs(10**-12) # evita log 0
@@ -89,7 +77,6 @@ def calcularFFT(sign, escala = 'dB'):
 	else:
 		fft = abs(np.fft.fftshift(np.fft.fft(sign))) 
 		return fft
-
 
 def plotar(sinais,ffts):
 	
@@ -112,13 +99,11 @@ def erroQuadraticoMedio(sinal1, sinal2):
 	MSE =  np.mean(erroQuadratico)
 	return MSE
 
-
 def alinharSinais(sinalMaior, sinalMenor):
 	'''
 	alinha o sinal maior com o sinal menor. Esta função tira a ultima parte do sinal maior.
 	*o erro quadratico medio deve ser 0 ao encontrar o filtro impulsivo em um processo de otimizacao
 	'''
-
 	#casting de seguranca
 	sinalMenor =  np.array(sinalMenor)
 	sinalMaior =  np.array(sinalMaior)
@@ -128,9 +113,6 @@ def alinharSinais(sinalMaior, sinalMenor):
 	sinalMaior = sinalMaior.ravel(-1)
 	return sinalMaior,sinalMenor
 
-#alinharSinais(sinal,corr)
-
-
 '''
 **********************************************************************************************
 **********************************************************************************************
@@ -138,7 +120,6 @@ def alinharSinais(sinalMaior, sinalMenor):
 **********************************************************************************************
 **********************************************************************************************
 '''
-
 
 import random
 
@@ -157,10 +138,6 @@ PORCENTAGEM = 10
 TAMANHO_DO_TORNEIO = round(POPULACAO*PORCENTAGEM/100)
 MAX_ITE = 400
 
-
-#scorr = signal.correlate(sinal, filtro, mode='valid')
-
-
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
@@ -171,28 +148,23 @@ toolbox.register("attr_int", random.randint, MENOR_AMPLITUDE, MAIOR_AMPLITUDE) #
 toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_int, SIZE_FILTER) # teremos um filtro de 41 dimensoes
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-
+fullSignal = getSignal('siam','bag')
+sinal_siamese = np.ravel(fullSignal[:,DIM])
+sinal_siamese_master = np.array(sinal_siamese)
 
 def evalFilter(individual):
 
 	individual = [float(i) for i in individual]
 	filtro = np.array(individual)/sum([abs(i)+GAMMA for i in individual])
-	corr = signal.correlate(sinal_master, filtro, mode='valid')
-	sinal,corr = alinharSinais(sinal_master,corr)
+	corr = signal.correlate(sinal_siamese_master, filtro, mode='valid')
+	sinal,corr = alinharSinais(sinal_siamese_master,corr)
 	MSE = erroQuadraticoMedio(sinal,corr)
 	return MSE,
-
-
-
-
 
 toolbox.register("evaluate", evalFilter)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutUniformInt ,indpb=PROBABILIDADE_MUTACAO_GENE,low= MENOR_AMPLITUDE, up=MAIOR_AMPLITUDE )#, MENOR_AMPLITUDE, MAIOR_AMPLITUDE,indpb=0.05 )
 toolbox.register("select", tools.selTournament, tournsize=TAMANHO_DO_TORNEIO)
-
-
-
 
 hof = tools.HallOfFame(10)
 
@@ -206,10 +178,6 @@ def main():
 		
 		ind.fitness.values = fit
 
-	# CXPB  is the probability with which two individuals
-	#       are crossed
-	#
-	# MUTPB is the probability for mutating an individual
 	CXPB = PROBABILIDADE_CROSS_OVER
 	MUTPB = PROBABILIDADE_MUTACAO_INDIVIDUO
 
@@ -235,8 +203,6 @@ def main():
 		'''
 		# Clone the selected individuals
 		offspring = list(map(toolbox.clone, offspring))
-		
-		#print('lista de filhos: ',offspring)
 
 		# Apply crossover and mutation on the offspring
 		for child1, child2 in zip(offspring[::2], offspring[1::2]):
@@ -253,24 +219,17 @@ def main():
 
 		# Evaluate the individuals with an invalid fitness
 		invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-		#print(invalid_ind[0])
-		#invalid_ind[0] = np.zeros([41])
-		#nvalid_ind[0][0] = 1
+
 		fitnesses = map(toolbox.evaluate, invalid_ind)
 		for ind, fit in zip(invalid_ind, fitnesses):
 			ind.fitness.values = fit
 		#print("populacao de pais: ", pop)
 		hof.update(pop)
 		pop[:] = offspring
-		#pop[0]= np.array([90,10,15,14,67])
-		#print("populacao de filhos: ", pop)
 
 		# Gather all the fitnesses in one list and print the stats
 		fits = [ind.fitness.values[0] for ind in pop]
 		
-		
-		
-
 		print(hof[3])
 
 		length = len(pop)
