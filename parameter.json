@@ -1,0 +1,157 @@
+[
+	{	
+		"datasetRunner":
+		{
+			"comentario": "Arquivo com os parametros necessarios para execucao do script de tracker para um dataset",
+			"threads": 3,
+			"parametros": [40],
+			"frames_before_feedback": 15,
+			"print_siamese_log": false,
+			"mode": [0]
+		}
+	}
+	,
+
+	{
+		"process":
+		{
+			"video_teste" : "wiper",
+			"nome_saida": "2019-01-21_teste_filtro_otimo",
+			"parametro": 15,
+			"print_siamese_log": false
+		}
+	}
+
+	,
+
+	{
+		"analise":
+		{
+			"threshold": 0.25,
+			"occlusionFile": "occlusion.label"
+		}
+	}
+	,
+
+	{
+		"sistema":
+		{
+			"python": "python",
+			"SO":"windows",
+			"computador":"DESKTOP-668IF5K",
+			"nickname": "dijkstra"
+		}
+		,
+
+		"tracker":
+		{
+			"trackerPath": "C:\\Users\\hugol\\Documents\\superSiamese\\tracker.py",
+			"datasetPath": "C:\\Users\\hugol\\Documents\\vot2015",
+			"groundTruthFile": "groundtruth.txt",
+			"show" : false,
+			"single" : false,
+			"log_folder" : "__log__"
+		}
+	}
+	,
+
+	{	
+		"sistema":
+		{
+			"python": "python",
+			"SO":"linux",
+			"computador":"NOT SPECIFIED - CHECK JSON FILE",
+			"nickname": "hugo pessoal"
+		}
+		,
+
+		"tracker":
+		{
+			"trackerPath": "/home/hugo/Documents/Mestrado/neoSiamese/tracker.py",
+			"datasetPath": "/home/hugo/Documents/Mestrado/vot2015",
+			"groundTruthFile": "groundtruth.txt",
+			"show" : false,
+			"single" : true,
+			"log_folder" : "__log__"
+		}
+
+	}
+	,
+	{	
+		"sistema":
+		{
+			"python": "python",
+			"SO":"windows",
+			"computador":"hc",
+			"nickname": "hugo windows"
+		}
+		,
+
+		"tracker":
+		{
+			"trackerPath": "NOT SPECIFIED - CHECK JSON FILE",
+			"datasetPath": "NOT SPECIFIED - CHECK JSON FILE",
+			"groundTruthFile": "groundtruth.txt",
+			"show" : false,
+			"single" : true,
+			"log_folder" : "__log__", 
+			"gtEspacialPath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles" ,
+			"siameseEspacialPath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles"
+		}
+
+	}
+
+	,
+
+	{	
+		"sistema":
+		{
+			"python": "python3.5",
+			"SO":"linux",
+			"computador":"schrodinger",
+			"nickname" : "xodinha"
+			
+		},
+		"tracker":
+		{
+			"trackerPath": 		   "/home/schrodinger/sdc/hugo/superSiamese/tracker.py",
+			"datasetPath": 		   "/home/schrodinger/sdc/hugo/vot2015",
+			"gtPath": 			   "/home/schrodinger/sdc/hugo/ga/List_zFeat_GT_Original_[Pickle]",
+			"gtEspacialPath": 	   "/home/schrodinger/sdc/hugo/superSiamese/list_zfeat/GT_Espacial_[Pickle]",
+			"siamesePath": 		   "/home/schrodinger/sdc/hugo/ga/List_zFeat_Siamese_Original_[Pickle]",
+			"siameseEspacialPath": "/home/schrodinger/sdc/hugo/superSiamese/list_zfeat/Siamese_Espacial_[Pickle]",
+			"saveFolder":		   "/home/schrodinger/sdc/hugo/GA/filtro_teste_27",
+			"groundTruthFile": 	   "groundtruth.txt",
+			"show" : false,
+			"single" : false,
+			"log_folder" : "__log__",
+			"gaNumProcess": 40
+		}
+	}
+	,
+
+	{	"sistema":
+		{
+			"python": "python3.6",
+			"SO":"linux",
+			"computador":"laplace",
+			"nickname" : "keeeeeeeeeeeeeeeeeeeeeevyn"
+		},
+
+		"tracker":
+		{
+			"trackerPath": 		   "/home/swhants/Documentos/GitHub/superSiamese/tracker_test_optimal_filter.py",
+			"datasetPath": 		   "/home/swhants/Documentos/vot2015",
+			"gtPath": 			   "/home/swhants/Documentos/GitHub/superSiamese/list_zfeat/GT_Original_[Pickle]",
+			"gtEspacialPath": 	   "/home/swhants/Documentos/GitHub/superSiamese/list_zfeat/GT_Espacial_[Pickle]",
+			"siamesePath": 		   "/home/swhants/Documentos/GitHub/superSiamese/list_zfeat/Siamese_Original_[Pickle]",
+			"siameseEspacialPath": "/home/swhants/Documentos/GitHub/superSiamese/list_zfeat/Siamese_Espacial_[Pickle]",
+			"saveFolder":		   "/home/swhants/Documentos/GitHub/superSiamese/filters/filtro_teste_24",
+			"groundTruthFile": 	   "groundtruth.txt",
+			"show" : false,
+			"single" : false,
+			"log_folder" : "__log__",
+			"gaNumProcess": 4
+		}
+	}
+]
