@@ -31,7 +31,7 @@ FEATURE =  30
 VIDEO = 'bag'
 X =3
 Y =3
-DIM = 10
+DIM = 125
 SIZE_FILTER = 41
 
 def getPathPickle(tipo):
@@ -136,7 +136,7 @@ PROBABILIDADE_CROSS_OVER=0.95
 POPULACAO = 5*SIZE_FILTER
 PORCENTAGEM = 10
 TAMANHO_DO_TORNEIO = round(POPULACAO*PORCENTAGEM/100)
-MAX_ITE = 400
+MAX_ITE = 3000
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -148,12 +148,15 @@ toolbox.register("attr_int", random.randint, MENOR_AMPLITUDE, MAIOR_AMPLITUDE) #
 toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_int, SIZE_FILTER) # teremos um filtro de 41 dimensoes
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-fullSignal = getSignal('siam','bag')
-sinal_siamese = np.ravel(fullSignal[:,DIM])
+fullSignalSiam = getSignal('siam','bag')
+sinal_siamese = np.ravel(fullSignalSiam[:,DIM])
 sinal_siamese_master = np.array(sinal_siamese)
 
-def evalFilter(individual):
+fullSignalGt = getSignal('gt','bag')
+sinal_gt = np.ravel(fullSignalGt[:,DIM])
+sinal_gt_master = np.array(sinal_gt)
 
+def evalFilter(individual):
 	individual = [float(i) for i in individual]
 	filtro = np.array(individual)/sum([abs(i)+GAMMA for i in individual])
 	corr = signal.correlate(sinal_siamese_master, filtro, mode='valid')
@@ -161,7 +164,19 @@ def evalFilter(individual):
 	MSE = erroQuadraticoMedio(sinal,corr)
 	return MSE,
 
-toolbox.register("evaluate", evalFilter)
+def evalFilter2(individual):
+	individual = [float(i) for i in individual]
+	filtro = np.array(individual)/sum([abs(i)+GAMMA for i in individual])
+	corr = signal.correlate(sinal_siamese_master, filtro, mode='valid')
+	sinal,corr = alinharSinais(sinal_gt_master,corr)
+	MSE = erroQuadraticoMedio(sinal,corr)
+	return MSE,
+
+'''
+setado para o caso real
+'''
+
+toolbox.register("evaluate", evalFilter2)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutUniformInt ,indpb=PROBABILIDADE_MUTACAO_GENE,low= MENOR_AMPLITUDE, up=MAIOR_AMPLITUDE )#, MENOR_AMPLITUDE, MAIOR_AMPLITUDE,indpb=0.05 )
 toolbox.register("select", tools.selTournament, tournsize=TAMANHO_DO_TORNEIO)
@@ -192,7 +207,6 @@ def main():
 		# A new generation
 		g = g + 1
 		print("-- Generation %i --" % g)
-
 
 		# Select the next generation individuals
 		offspring = toolbox.select(pop ,len(pop))
