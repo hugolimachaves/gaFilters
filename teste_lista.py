@@ -20,35 +20,38 @@ import random
 
 # Variaveis obtidas atraves do arquivo parameter.json
 #--------------------------------------------------------------------
-#PATH_GT               = lp.getInJson('tracker','gtPath')
+PATH_GT               = lp.getInJson('tracker','gtPath')
 PATH_GT_ESPACIAL      = lp.getInJson('tracker','gtEspacialPath')
-#PATH_SIAMESE          = lp.getInJson('tracker','siamesePath')
+PATH_SIAMESE          = lp.getInJson('tracker','siamesePath')
 PATH_SIAMESE_ESPACIAL = lp.getInJson('tracker','siameseEspacialPath')
 #--------------------------------------------------------------------
 
-TIPO = 'siam'
-FEATURE =  30
-VIDEO = 'bag'
+#TIPO = 'siam'
+#FEATURE =  30
+#VIDEO = 'bag'
 X =3
 Y =3
-DIM = 125
-SIZE_FILTER = 41
+DIM = 25
+SIZE_FILTER = 61
 
 def getPathPickle(tipo):
 	if tipo == 'gt':
-		caminhoPickle = PATH_GT_ESPACIAL
+		caminhoPickle = PATH_GT
 	if tipo == 'siam':
+		caminhoPickle = PATH_SIAMESE
+	if tipo == 'gt_espacial':
+		caminhoPickle = PATH_GT_ESPACIAL
+	if tipo == 'siam_espacial':
 		caminhoPickle = PATH_SIAMESE_ESPACIAL
 	return caminhoPickle
 
-def getSignal(tipo, video):
+def getSignal(tipo, video, xx, yy):
 	
 	caminhoPickle = getPathPickle(tipo)
 	fullPath = os.path.join(caminhoPickle,tipo+'_'+video +'.pickle')
 	file_siamese = open(fullPath, 'rb')
 	list_zFeat = np.array(pickle.load(file_siamese))
 	file_siamese.close()
-	ts = int(list_zFeat.shape[0])
 	media = []
 	pontos_de_recorte = [i for i in range(0,int(list_zFeat.shape[0]+1),int(list_zFeat.shape[0]/9))]
 	MEDIA_ESPACIAL = 1
@@ -57,13 +60,23 @@ def getSignal(tipo, video):
 	media = np.array(media)
 	result = np.mean(media,axis=0)
 	acc = np.zeros([int(list_zFeat.shape[0]/9),256])
-	for i in range(X,X+1):
-		for j in range(Y,Y+1):
-			acc[:,:] = result[:,X,Y,:,0] + acc[:,:]
+	for i in range(xx,xx+1):
+		for j in range(yy,yy+1):
+			acc[:,:] = result[:,xx,yy,:,0] + acc[:,:]
 	return acc
+	
+def getSignal2(tipo, video, xx, yy):
 
-
-
+	caminhoPickle = getPathPickle(tipo)
+	fullPath = os.path.join(caminhoPickle,video +'.pickle')
+	file_siamese = open(fullPath, 'rb')
+	list_zFeat = np.array(pickle.load(file_siamese))
+	file_siamese.close()
+	singleZFeat = np.zeros([int(list_zFeat.shape[0]),256])
+	for i in range(xx,xx+1):
+		for j in range(yy,yy+1):
+			singleZFeat[:,:] = list_zFeat[:,xx,yy,:,0] 
+	return singleZFeat # t e d, mas apenas uma de x e y
 
 filtro = np.zeros(SIZE_FILTER)/SIZE_FILTER
 
@@ -105,13 +118,26 @@ def alinharSinais(sinalMaior, sinalMenor):
 	*o erro quadratico medio deve ser 0 ao encontrar o filtro impulsivo em um processo de otimizacao
 	'''
 	#casting de seguranca
+
+	#print("first debug in function: ", sinalMaior.shape)
 	sinalMenor =  np.array(sinalMenor)
 	sinalMaior =  np.array(sinalMaior)
+	'''
 	diferencaDimensional = sinalMaior.shape[0] - sinalMenor.shape[0]
 	sinalMaior = sinalMaior[: sinalMaior.shape[0] - diferencaDimensional]
 	sinalMenor = sinalMenor.ravel(-1)
 	sinalMaior = sinalMaior.ravel(-1)
 	return sinalMaior,sinalMenor
+	'''
+
+	dim_N = np.max(sinalMenor.shape)
+	dim_M = np.max(sinalMaior.shape)
+
+	#print("dim_N: ",dim_N, " dim_M: ", dim_M)
+
+	sinalMaior = sinalMaior[ dim_M - dim_N  : dim_M]
+	#print("debug in function: sinal maior", sinalMaior.shape, " sinal menor: ", sinalMenor.shape )
+	return sinalMaior, sinalMenor
 
 '''
 **********************************************************************************************
@@ -136,7 +162,7 @@ PROBABILIDADE_CROSS_OVER=0.95
 POPULACAO = 5*SIZE_FILTER
 PORCENTAGEM = 10
 TAMANHO_DO_TORNEIO = round(POPULACAO*PORCENTAGEM/100)
-MAX_ITE = 3000
+MAX_ITE = 300
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -148,32 +174,74 @@ toolbox.register("attr_int", random.randint, MENOR_AMPLITUDE, MAIOR_AMPLITUDE) #
 toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_int, SIZE_FILTER) # teremos um filtro de 41 dimensoes
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-fullSignalSiam = getSignal('siam','bag')
-sinal_siamese = np.ravel(fullSignalSiam[:,DIM])
-sinal_siamese_master = np.array(sinal_siamese)
+sinal_siamese_master = []
+sinal_gt_master = []
+listaDeVideos = ['bag', 'tunnel', 'ball1']
 
-fullSignalGt = getSignal('gt','bag')
-sinal_gt = np.ravel(fullSignalGt[:,DIM])
-sinal_gt_master = np.array(sinal_gt)
+for video in range(len(listaDeVideos)):
+	sinal_siamese_master.append([])
+	sinal_gt_master.append([])
+	for xx in range(6):
+		sinal_siamese_master[video].append([])
+		sinal_gt_master[video].append([])
+		for yy in range(6):
+			sinal_siamese_master[video][xx].append([])
+			sinal_gt_master[video][xx].append([])
+
+
+for numero_video,video in enumerate(listaDeVideos):
+	for xx in range(6):
+		for yy in range(6):
+
+			fullSignalSiam = getSignal2('siam',video,xx,yy)
+			sinal_siamese = np.ravel(fullSignalSiam[:,DIM])
+			sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
+
+			fullSignalGt = getSignal2('gt',video,xx,yy)
+			sinal_gt = np.ravel(fullSignalGt[:,DIM])
+			sinal_gt_master[numero_video][xx][yy] = np.array(sinal_gt)
+
+'''
+sen_exp = np.sin([ (i/4) for i in range(196)]) * np.array([ (np.exp(-0.02*i)) for i in range(1,197)])
+print(sen_exp)
+sinal_siamese_master = np.array( sen_exp + np.sin([ i/7 for i in range(196)]))
+sinal_gt_master = np.sin([ (i/4) for i in range(196)])
+'''
+
+#print('done')
+#print(sinal_gt_master[0][0])
 
 def evalFilter(individual):
 	individual = [float(i) for i in individual]
 	filtro = np.array(individual)/sum([abs(i)+GAMMA for i in individual])
-	corr = signal.correlate(sinal_siamese_master, filtro, mode='valid')
-	sinal,corr = alinharSinais(sinal_siamese_master,corr)
-	MSE = erroQuadraticoMedio(sinal,corr)
-	return MSE,
+	corr = signal.correlate(sinal_siamese_master, filtro, mode='same')
+	#sinal,corr = alinharSinais(sinal_siamese_master,corr)
+	#MSE = erroQuadraticoMedio(sinal,corr)
+	#return MSE,
+
 
 def evalFilter2(individual):
 	individual = [float(i) for i in individual]
+	
 	filtro = np.array(individual)/sum([abs(i)+GAMMA for i in individual])
-	corr = signal.correlate(sinal_siamese_master, filtro, mode='valid')
-	sinal,corr = alinharSinais(sinal_gt_master,corr)
-	MSE = erroQuadraticoMedio(sinal,corr)
+	MSE = 0
+
+	for video in range(len(listaDeVideos)):
+		for xx in range(6):
+			for yy in range(6):
+				
+				#corr = signal.convolve(sinal_siamese_master[xx][yy],filtro,  mode='full') # alterar para correlate!		
+				#sinal,corr = alinharSinais(corr,sinal_gt_master[xx][yy])
+				corr = np.correlate(sinal_siamese_master[video][xx][yy],filtro,  mode='full') # alterar para correlate!
+				sinal,corr = alinharSinais(corr,sinal_gt_master[video][xx][yy])
+
+
+				#print("sinal e corr: ",sinal.shape, corr.shape)
+				MSE += erroQuadraticoMedio(corr,sinal)
 	return MSE,
 
 '''
-setado para o caso real
+#setado para o caso real
 '''
 
 toolbox.register("evaluate", evalFilter2)
@@ -211,9 +279,9 @@ def main():
 		# Select the next generation individuals
 		offspring = toolbox.select(pop ,len(pop))
 		'''
-		print("Numero de individuos: ",len(offspring))
-		print(offspring)
-		input('aperta qualquer coisa')
+		#print("Numero de individuos: ",len(offspring))
+		#print(offspring)
+		#input('aperta qualquer coisa')
 		'''
 		# Clone the selected individuals
 		offspring = list(map(toolbox.clone, offspring))
@@ -255,8 +323,31 @@ def main():
 		print("  Max %s" % max(fits))
 		print("  Avg %s" % mean)
 		print("  Std %s" % std)
+	return hof[0]
 
-main()
+vet =main()
+
+#filtro= [1,0,0,0,0,0,0,0,0,0,0,0,0]
+filtro = vet
+
+
+axt = plt.subplot(121)
+axt.set_ylim([min([0,min(filtro)]),max(filtro)])
+plt.bar(np.arange(0,len(filtro)),filtro)
+
+
+vetFreq = np.fft.fftshift(abs(np.fft.fft(vet)))
+
+
+
+
+'''
+plt.bar(np.arange(0,max(corr.shape)),corr)
+
+'''
+axt = plt.subplot(122)
+plt.bar(np.arange(0,len(vetFreq)), vetFreq )
+plt.show()
 
 #print(corr)
-print(sinal)
+#print(sinal)

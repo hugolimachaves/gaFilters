@@ -95,8 +95,10 @@
 			"show" : false,
 			"single" : true,
 			"log_folder" : "__log__", 
-			"gtEspacialPath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles" ,
-			"siameseEspacialPath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles"
+			"gtEspacialPath": "NOT SPECIFIED - CHECK JSON FILE",
+			"gtPath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles\\GT_Original_[Pickle]" ,
+			"siameseEspacialPath": "NOT SPECIFIED - CHECK JSON FILE",
+			"siamesePath": "C:\\Users\\hugol\\Documents\\mestrado\\pickles\\Siamese_Original_[Pickle]"
 		}
 
 	}
