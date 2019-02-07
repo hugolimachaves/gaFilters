@@ -79,7 +79,8 @@ def overall(DIM):
 		singleZFeat = np.zeros([int(list_zFeat.shape[0]),256])
 		for i in range(xx,xx+1):
 			for j in range(yy,yy+1):
-				singleZFeat[:,:] = list_zFeat[:,xx,yy,:,0] 
+				singleZFeat[:,:] = list_zFeat[:,xx,yy,:,0]
+
 		return singleZFeat # t e d, mas apenas uma de x e y
 
 	filtro = np.zeros(SIZE_FILTER)/SIZE_FILTER
@@ -180,7 +181,7 @@ def overall(DIM):
 
 	sinal_siamese_master = []
 	sinal_gt_master = []
-	listaDeVideos = ['bag', 'tunnel', 'ball1']
+	listaDeVideos = ['bag'] #, 'tunnel', 'ball1']
 
 	for video in range(len(listaDeVideos)):
 		sinal_siamese_master.append([])
@@ -200,6 +201,7 @@ def overall(DIM):
 				fullSignalSiam = getSignal2('siam',video,xx,yy)
 				sinal_siamese = np.ravel(fullSignalSiam[:,DIM])
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
+				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*0.3
 
 				fullSignalGt = getSignal2('gt',video,xx,yy)
 				sinal_gt = np.ravel(fullSignalGt[:,DIM])

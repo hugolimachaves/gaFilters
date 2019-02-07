@@ -9,7 +9,9 @@ N_FILTROS = 256
 def f(x):
 	
 	x = str(x)
-	return 	tl.overall(x)
+	k = tl.overall(x)
+	print(k)
+	return k	
 
 if __name__ == '__main__':
 	p = Pool(N_THREADS)
@@ -22,6 +24,6 @@ if __name__ == '__main__':
 			listaExec.append(i+j)
 			
 		print('Nesta rodada serao executadas otimizacoes de filtros  das seguintes dimensoes: ', listaExec)
-		#p.map(f, listaExec)
+		p.map(f, listaExec)
 		
 		
