@@ -10,6 +10,17 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import random
 
+#
+TESTE_MODE = False
+ORIGEM = 'siam'
+ALVO = 'gt'
+GAUSSIAN_DEFINED = False
+
+N = 41
+sigma = N/6
+gaussianFilter =  np.array(signal.gaussian(N,sigma))
+
+
 '''
 **********************************************************************************************
 **********************************************************************************************
@@ -18,9 +29,14 @@ import random
 **********************************************************************************************
 '''
 
-def overall(DIM):
+def overall(dim, TESTE_MODE = False):
 	
-	DIM = int(DIM)
+	if TESTE_MODE:
+		input("Verifique as condiçoes no inicio do codigo")
+		dim = 25
+	else:
+		dim = int(dim)
+	
 	# Variaveis obtidas atraves do arquivo parameter.json
 	#--------------------------------------------------------------------
 	PATH_GT               = lp.getInJson('tracker','gtPath')
@@ -30,12 +46,7 @@ def overall(DIM):
 	SHOW				  = lp.getInJson('tracker','show') 
 	#--------------------------------------------------------------------
 
-	#TIPO = 'siam'
-	#FEATURE =  30
-	#VIDEO = 'bag'
-	X =3
-	Y =3
-	#DIM = 25
+	
 	SIZE_FILTER = 41
 
 	def getPathPickle(tipo):
@@ -181,7 +192,7 @@ def overall(DIM):
 
 	sinal_siamese_master = []
 	sinal_gt_master = []
-	listaDeVideos = ['bag'] #, 'tunnel', 'ball1']
+	listaDeVideos = ['bag', 'racing', 'ball1']
 
 	for video in range(len(listaDeVideos)):
 		sinal_siamese_master.append([])
@@ -198,13 +209,13 @@ def overall(DIM):
 		for xx in range(6):
 			for yy in range(6):
 
-				fullSignalSiam = getSignal2('siam',video,xx,yy)
-				sinal_siamese = np.ravel(fullSignalSiam[:,DIM])
+				fullSignalSiam = getSignal2(ORIGEM,video,xx,yy)
+				sinal_siamese = np.ravel(fullSignalSiam[:,dim])
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*0.3
 
-				fullSignalGt = getSignal2('gt',video,xx,yy)
-				sinal_gt = np.ravel(fullSignalGt[:,DIM])
+				fullSignalGt = getSignal2(ALVO,video,xx,yy)
+				sinal_gt = np.ravel(fullSignalGt[:,dim])
 				sinal_gt_master[numero_video][xx][yy] = np.array(sinal_gt)
 
 	'''
@@ -238,7 +249,11 @@ def overall(DIM):
 					
 					#corr = signal.convolve(sinal_siamese_master[xx][yy],filtro,  mode='full') # alterar para correlate!		
 					#sinal,corr = alinharSinais(corr,sinal_gt_master[xx][yy])
-					corr = np.correlate(sinal_siamese_master[video][xx][yy],filtro,  mode='full') # alterar para correlate!
+					sigRef = sinal_siamese_master[video][xx][yy]
+					if(GAUSSIAN_DEFINED):
+						sigRef = np.correlate(sigRef,gaussianFilter,  mode='same')
+
+					corr = np.correlate(sigRef,filtro,  mode='full') # alterar para correlate!
 					sinal,corr = alinharSinais(corr,sinal_gt_master[video][xx][yy])
 
 
@@ -318,28 +333,28 @@ def overall(DIM):
 			# Gather all the fitnesses in one list and print the stats
 			fits = [ind.fitness.values[0] for ind in pop]
 			
-			#print(hof[3])
+			print(hof[0])
 
 			length = len(pop)
 			mean = sum(fits) / length
 			sum2 = sum(x*x for x in fits)
 			std = abs(sum2 / length - mean**2)**0.5
 			
-			#print("  Min %s" % min(fits))
-			#print("  Max %s" % max(fits))
-			#print("  Avg %s" % mean)
-			#print("  Std %s" % std)
+			print("  Min %s" % min(fits))
+			print("  Max %s" % max(fits))
+			print("  Avg %s" % mean)
+			print("  Std %s" % std)
 		return hof[0]
 	vet = main()
 	
-	arquivo = os.path.join(lp.getInJson("tracker","filterFolder"), "filtro_"+str(DIM)+".pickle" )
+	arquivo = os.path.join(lp.getInJson("tracker","filterFolder"), "filtro_"+str(dim)+".pickle" )
 	pickle_var = open(arquivo ,"wb")
 	pickle.dump(np.array(vet), pickle_var)
 	pickle_var.close()
 	return np.array(vet)
 
 
-
+#print(overall(1))
 
 
 
@@ -355,3 +370,16 @@ if SHOW:
 	plt.bar(np.arange(0,len(vetFreq)), vetFreq )
 	plt.show()
 '''	
+
+'''
+standard
+[100  97  73  66  73  58  49  44  37  39  44  43  41  32  38  50  48  45
+  34  34  40  33 -24 -28 -27  33  36  40  39  37  51  57  55  50  53  50
+  51  44  45  38  34]
+
+gaussian
+
+[ 72  49  79 -56 -58 -47 -98  74  90  19 -70 -69  92  43 -62 -32  31  70
+  82 -75 -66  81 -39 -54 -20 -67  33  50  26  47  84  83 -90 -64 -59 -99
+  26  90 -64  83  27]
+'''
