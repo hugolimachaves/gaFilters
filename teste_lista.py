@@ -15,7 +15,7 @@ import json
 TESTE_MODE = False
 ORIGEM = 'siam'
 ALVO = 'gt'
-GAUSSIAN_DEFINED = False
+GAUSSIAN_DEFINED = True
 
 N = 41
 sigma = N/6
