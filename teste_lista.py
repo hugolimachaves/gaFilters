@@ -9,6 +9,7 @@ import localParameters as lp
 import matplotlib.pyplot as plt
 from scipy import signal
 import random
+import json
 
 #
 TESTE_MODE = False
@@ -346,8 +347,16 @@ def overall(dim, TESTE_MODE = False):
 			print("  Std %s" % std)
 		return hof[0]
 	vet = main()
+
+	fileName = 'version.json'
+	KEY = 'version'
+
+	with open(fileName) as file:
+		data = json.load(file)
+		print("data value: ",data[KEY])
+
 	
-	arquivo = os.path.join(lp.getInJson("tracker","filterFolder"), "filtro_"+str(dim)+".pickle" )
+	arquivo = os.path.join(lp.getInJson("tracker","filterFolder"),'filtro_v'+str(data[KEY]), "filtro_"+str(dim)+".pickle" )
 	pickle_var = open(arquivo ,"wb")
 	pickle.dump(np.array(vet), pickle_var)
 	pickle_var.close()
@@ -355,9 +364,6 @@ def overall(dim, TESTE_MODE = False):
 
 
 #print(overall(1))
-
-
-
 
 '''
 if SHOW:
