@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	N_THREADS = lp.getInJson("tracker","gaNumProcess")
 	N_FILTROS = 256
 
-	input("Verifique as condiçoes no inicio do codigo")
+	#input("Verifique as condiçoes no inicio do codigo")
 	p = Pool(N_THREADS)
 	listaDim = [i for i in range(0,N_FILTROS,N_THREADS)]
 	print(listaDim)

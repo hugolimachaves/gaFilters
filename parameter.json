@@ -115,7 +115,7 @@
 			"siamesePath": 		   "/home/schrodinger/sdc/hugo/ga/List_zFeat_Siamese_Original_[Pickle]",
 			"siameseEspacialPath": "/home/schrodinger/sdc/hugo/superSiamese/list_zfeat/Siamese_Espacial_[Pickle]",
 			"saveFolder":		   "/home/schrodinger/sdc/hugo/GA/filtro_teste_27",
-			"filterFolder":  "/home/schrodinger/sdc/hugo/GA/",
+			"filterFolder":  "/home/schrodinger/sdc/hugo/ga/filterFolder",
 			"groundTruthFile": 	   "groundtruth.txt",
 			"show" : false,
 			"single" : false,
