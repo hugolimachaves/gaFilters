@@ -15,7 +15,7 @@ import json
 TESTE_MODE = False
 ORIGEM = 'siam'
 ALVO = 'gt'
-GAUSSIAN_DEFINED = True
+GAUSSIAN_DEFINED = False
 
 N = 41
 sigma = N/6
@@ -193,7 +193,7 @@ def overall(dim, TESTE_MODE = False):
 
 	sinal_siamese_master = []
 	sinal_gt_master = []
-	listaDeVideos = ['bag', 'racing', 'ball1']
+	listaDeVideos = ['bag', 'racing', 'ball1', 'octopus', 'bolt2']
 
 	for video in range(len(listaDeVideos)):
 		sinal_siamese_master.append([])
