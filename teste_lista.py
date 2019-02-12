@@ -16,8 +16,10 @@ TESTE_MODE = False
 ORIGEM = 'siam'
 ALVO = 'gt'
 GAUSSIAN_DEFINED = False
-MEDIA_INICIAL_DEFINED = True
+MEDIA_INICIAL_DEFINED = False
 TAMANHO_MEDIA_INICIAL = 15
+listaDeVideos = ['bag']#, 'racing', 'ball1', 'octopus', 'bolt2']
+SIZE_FILTER = 41
 
 N = 41
 sigma = N/6
@@ -35,8 +37,10 @@ gaussianFilter =  np.array(signal.gaussian(N,sigma))
 def overall(dim, TESTE_MODE = False):
 	
 	if TESTE_MODE:
-		input("Verifique as condiçoes no inicio do codigo")
 		dim = 25
+		print("A dimensao utilizada para teste sera: ", dim)
+		input("Verifique as condiçoes no inicio do codigo")
+		
 	else:
 		dim = int(dim)
 	
@@ -50,7 +54,7 @@ def overall(dim, TESTE_MODE = False):
 	#--------------------------------------------------------------------
 
 	
-	SIZE_FILTER = 41
+
 
 	def getPathPickle(tipo):
 		if tipo == 'gt':
@@ -195,7 +199,7 @@ def overall(dim, TESTE_MODE = False):
 
 	sinal_siamese_master = []
 	sinal_gt_master = []
-	listaDeVideos = ['bag', 'racing', 'ball1', 'octopus', 'bolt2']
+
 	sinal_siamese_master_media = []
 
 	for video in range(len(listaDeVideos)):
@@ -263,11 +267,8 @@ def overall(dim, TESTE_MODE = False):
 						sigRef = sigRef*0.5 + sinal_siamese_master_media[numero_video][xx][yy]*0.5
 					if(GAUSSIAN_DEFINED):
 						sigRef = np.correlate(sigRef,gaussianFilter,  mode='same')
-
 					corr = np.correlate(sigRef,filtro,  mode='full') # alterar para correlate!
 					sinal,corr = alinharSinais(corr,sinal_gt_master[video][xx][yy])
-
-
 					#print("sinal e corr: ",sinal.shape, corr.shape)
 					MSE += erroQuadraticoMedio(corr,sinal)
 		return MSE,
@@ -373,7 +374,7 @@ def overall(dim, TESTE_MODE = False):
 	return np.array(vet)
 
 
-#print(overall(1))
+print(overall(1))
 
 '''
 if SHOW:
