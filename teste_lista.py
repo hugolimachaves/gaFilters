@@ -18,8 +18,9 @@ ALVO = 'gt'
 GAUSSIAN_DEFINED = False
 MEDIA_INICIAL_DEFINED = False
 TAMANHO_MEDIA_INICIAL = 15
-listaDeVideos = ['bag']#, 'racing', 'ball1', 'octopus', 'bolt2']
+listaDeVideos = ['bolt2']#, 'racing', 'ball1', 'octopus', 'bolt2']
 SIZE_FILTER = 41
+AMPLITUDE_RUIDO = 0.3
 
 N = 41
 sigma = N/6
@@ -223,7 +224,7 @@ def overall(dim, TESTE_MODE = False):
 				fullSignalSiam = getSignal2(ORIGEM,video,xx,yy)
 				sinal_siamese = np.ravel(fullSignalSiam[:,dim])
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
-				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*0.3
+				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*AMPLITUDE_RUIDO
 				sinal_siamese_master_media[numero_video][xx][yy] = np.mean(np.array(sinal_siamese[0:TAMANHO_MEDIA_INICIAL]))
 
 				fullSignalGt = getSignal2(ALVO,video,xx,yy)
