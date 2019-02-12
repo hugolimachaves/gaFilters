@@ -16,6 +16,8 @@ TESTE_MODE = False
 ORIGEM = 'siam'
 ALVO = 'gt'
 GAUSSIAN_DEFINED = False
+MEDIA_INICIAL_DEFINED = True
+TAMANHO_MEDIA_INICIAL = 15
 
 N = 41
 sigma = N/6
@@ -194,16 +196,20 @@ def overall(dim, TESTE_MODE = False):
 	sinal_siamese_master = []
 	sinal_gt_master = []
 	listaDeVideos = ['bag', 'racing', 'ball1', 'octopus', 'bolt2']
+	sinal_siamese_master_media = []
 
 	for video in range(len(listaDeVideos)):
 		sinal_siamese_master.append([])
 		sinal_gt_master.append([])
+		sinal_siamese_master_media.append([])
 		for xx in range(6):
 			sinal_siamese_master[video].append([])
 			sinal_gt_master[video].append([])
+			sinal_siamese_master_media[video].append([])
 			for yy in range(6):
 				sinal_siamese_master[video][xx].append([])
 				sinal_gt_master[video][xx].append([])
+				sinal_siamese_master_media[video][xx].append([])
 
 
 	for numero_video,video in enumerate(listaDeVideos):
@@ -214,10 +220,12 @@ def overall(dim, TESTE_MODE = False):
 				sinal_siamese = np.ravel(fullSignalSiam[:,dim])
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*0.3
+				sinal_siamese_master_media[numero_video][xx][yy] = np.mean(np.array(sinal_siamese[0:TAMANHO_MEDIA_INICIAL]))
 
 				fullSignalGt = getSignal2(ALVO,video,xx,yy)
 				sinal_gt = np.ravel(fullSignalGt[:,dim])
 				sinal_gt_master[numero_video][xx][yy] = np.array(sinal_gt)
+
 
 	'''
 	sen_exp = np.sin([ (i/4) for i in range(196)]) * np.array([ (np.exp(-0.02*i)) for i in range(1,197)])
@@ -251,6 +259,8 @@ def overall(dim, TESTE_MODE = False):
 					#corr = signal.convolve(sinal_siamese_master[xx][yy],filtro,  mode='full') # alterar para correlate!		
 					#sinal,corr = alinharSinais(corr,sinal_gt_master[xx][yy])
 					sigRef = sinal_siamese_master[video][xx][yy]
+					if(MEDIA_INICIAL_DEFINED):
+						sigRef = sigRef*0.5 + sinal_siamese_master_media[numero_video][xx][yy]*0.5
 					if(GAUSSIAN_DEFINED):
 						sigRef = np.correlate(sigRef,gaussianFilter,  mode='same')
 
