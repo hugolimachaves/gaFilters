@@ -18,7 +18,10 @@ ALVO = 'gt'
 GAUSSIAN_DEFINED = False
 MEDIA_INICIAL_DEFINED = True
 TAMANHO_MEDIA_INICIAL = 15
-listaDeVideos = ['bag','bolt2','car1','bolt1','fish2','handball1','leaves','soccer1','gymnastics1','birds1'] # blanket/bolt2 e  butterfly/pedestrian2 gymnastics1/road
+#listaDeVideos = ['bag','bolt2','car1','bolt1','fish2','handball1','leaves','soccer1','gymnastics1','birds1'] # blanket/bolt2 e  butterfly/pedestrian2 gymnastics1/road
+listaDeVideos1 = ['bag','bolt2','car1','singer1','tunnel'] # videos bons
+listaDeVideos2 = ['bolt1','fish2','handball1','leaves','soccer1'] # videos ruins
+listaDeVideos =  listaDeVideos1 + listaDeVideos2
 SIZE_FILTER = 41
 AMPLITUDE_RUIDO = 0.2
 
@@ -224,7 +227,10 @@ def overall(dim, TESTE_MODE = False):
 				fullSignalSiam = getSignal2(ORIGEM,video,xx,yy)
 				sinal_siamese = np.ravel(fullSignalSiam[:,dim])
 				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
-				sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*AMPLITUDE_RUIDO
+				if video in listaDeVideos1: # adiciona ruido apenas a uma classe de videos(por exempli, apenas videos bons)
+					sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese) + (np.random.rand(len(sinal_siamese_master[numero_video][xx][yy]))-0.5)*AMPLITUDE_RUIDO
+				else:
+					sinal_siamese_master[numero_video][xx][yy] = np.array(sinal_siamese)
 				sinal_siamese_master_media[numero_video][xx][yy] = np.mean(np.array(sinal_siamese[0:TAMANHO_MEDIA_INICIAL]))
 
 				fullSignalGt = getSignal2(ALVO,video,xx,yy)
