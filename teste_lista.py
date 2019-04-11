@@ -11,16 +11,16 @@ from scipy import signal
 import random
 import json
 
-#
+
 TESTE_MODE = False
 ORIGEM = 'siam'
 ALVO = 'gt'
 GAUSSIAN_DEFINED = False
-MEDIA_INICIAL_DEFINED = False
+MEDIA_INICIAL_DEFINED = True
 TAMANHO_MEDIA_INICIAL = 15
-listaDeVideos = ['bolt2']#, 'racing', 'ball1', 'octopus', 'bolt2']
+listaDeVideos = ['bag','bolt2','car1','bolt1','fish2','handball1','leaves','soccer1','gymnastics1','birds1'] # blanket/bolt2 e  butterfly/pedestrian2 gymnastics1/road
 SIZE_FILTER = 41
-AMPLITUDE_RUIDO = 0.3
+AMPLITUDE_RUIDO = 0.2
 
 N = 41
 sigma = N/6
@@ -375,7 +375,7 @@ def overall(dim, TESTE_MODE = False):
 	return np.array(vet)
 
 
-print(overall(1))
+#print(overall(1))
 
 '''
 if SHOW:

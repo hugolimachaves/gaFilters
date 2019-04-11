@@ -36,6 +36,7 @@ if __name__ == '__main__':
 
 	#input("Verifique as condiçoes no inicio do codigo")
 	p = Pool(N_THREADS)
+	#print('numero de threads e: ', N_THREADS)
 	listaDim = [i for i in range(0,N_FILTROS,N_THREADS)]
 	print(listaDim)
 	
